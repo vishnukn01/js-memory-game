@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+
+    <style>
+      .row {
+        display: inline-block;
+      }
+      .flip-box {
+        background-color: transparent;
+        width: 150px;
+        height: 150px;
+        border: 5px solid black;
+        perspective: 1000px;
+      }
+
+      .flip-box-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+      }
+
+      /* .flip-box:hover .flip-box-inner {
+  transform: rotateY(180deg);
+} */
+
+      /* .flip-box-inner {
+  transform: rotateY(180deg);
+} */
+
+      .flip-box-front,
+      .flip-box-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+      }
+
+      .flip-box-front {
+        background-color: #bbb;
+        color: black;
+      }
+
+      .flip-box-back {
+        background-color: #555;
+        color: white;
+        transform: rotateY(180deg);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flip-box row">
+      <div class="flip-box-inner">
+        <div class="flip-box-front">
+          <img class="game-tile-image" id="image-1" src="images/blank.jpeg" />
+        </div>
+        <div class="flip-box-back">
+          <img class="animalImage" />
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-box row">
+      <div class="flip-box-inner">
+        <div class="flip-box-front">
+          <img class="game-tile-image" id="image-2" src="images/blank.jpeg" />
+        </div>
+        <div class="flip-box-back">
+          <img class="animalImage" />
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-box row">
+      <div class="flip-box-inner">
+        <div class="flip-box-front">
+          <img class="game-tile-image" id="image-3" src="images/blank.jpeg" />
+        </div>
+        <div class="flip-box-back">
+          <img class="animalImage" />
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-box row">
+      <div class="flip-box-inner">
+        <div class="flip-box-front">
+          <img class="game-tile-image" id="image-4" src="images/blank.jpeg" />
+        </div>
+        <div class="flip-box-back">
+          <img class="animalImage" />
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-box row">
+      <div class="flip-box-inner">
+        <div class="flip-box-front">
+          <img class="game-tile-image" id="image-5" src="images/blank.jpeg" />
+        </div>
+        <div class="flip-box-back">
+          <img class="animalImage" />
+        </div>
+      </div>
+    </div>
+
+    <div class="flip-box row">
+      <div class="flip-box-inner">
+        <div class="flip-box-front">
+          <img class="game-tile-image" id="image-6" src="images/blank.jpeg" />
+        </div>
+        <div class="flip-box-back">
+          <img class="animalImage" />
+        </div>
+      </div>
+    </div>
+
+    <div class="score">
+      <p>Score: <span id="score-value">0</span></p>
+      <p>Failed Attempts: <span id="failed-attempts-value">0</span></p>
+    </div>
+
+    <div>
+      <button id="resetBtn">Reset Game</button>
+    </div>
+
+    <script>
+      const flipBox = document.querySelectorAll(".flip-box");
+      const animalImage = document.querySelectorAll(".animalImage");
+      let score = 0;
+      let failedAttempts = 0;
+
+      function shuffle(array) {
+        let currentIndex = array.length,
+          randomIndex;
+
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+          // Pick a remaining element.
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex],
+            array[currentIndex],
+          ];
+        }
+
+        return array;
+      }
+
+      /** On load,
+       * Shuffle images
+       */
+      let images = ["elephant", "monkey", "frog"];
+      let imagesArr = [];
+      images.forEach((img) => {
+        imagesArr.push(
+          { name: img, alt: `${img}-1` },
+          { name: img, alt: `${img}-2` }
+        );
+      });
+      let shuffledImages = shuffle(imagesArr);
+
+      /* Insert images randomly */
+      for (let i = 0; i < animalImage.length; i++) {
+        animalImage[i].setAttribute(
+          "src",
+          `/images/${shuffledImages[i].name}.jpeg`
+        );
+        animalImage[i].setAttribute("alt", `${shuffledImages[i].alt}`);
+      }
+
+      /* On click of each div */
+      let clickedArray = [];
+      flipBox.forEach((fb) => {
+        fb.addEventListener("click", (e) => {
+          // Flip over
+          fb.querySelector(".flip-box-inner").style.transform =
+            "rotateY(180deg)";
+
+          // Update clicked array
+          let clickedImage = {
+            name: fb.querySelector(".animalImage").getAttribute("src"),
+            alt: fb.querySelector(".animalImage").getAttribute("alt"),
+          };
+          clickedArray.push(clickedImage);
+
+          // Disable click on clicked image
+          fb.style.pointerEvents = "none";
+
+          // Perform checks
+          if (clickedArray.length === 2) {
+            performChecks(fb);
+          }
+        });
+      });
+
+      function performChecks(box) {
+        if (clickedArray[0].name === clickedArray[1].name) {
+          console.log("successful attempt");
+          score = score + 1;
+          // Update score in DOM
+        } else {
+          console.log("failed attempt");
+          failedAttempts = failedAttempts + 1;
+          // Update in DOM
+
+          // Flip images back
+          flipBack(box);
+        }
+        clickedArray = [];
+      }
+
+      function flipBack(box) {
+        clickedArray.forEach((i) => {
+          let el = document.querySelector(`[alt='${i.alt}']`).parentElement
+            .parentElement.parentElement;
+          console.log("el", el);
+          setTimeout(() => {
+            el.querySelector(".flip-box-inner").style.transform =
+              "rotateY(0deg)";
+
+            // Make it clickable again
+            el.style.pointerEvents = "auto";
+          }, 500);
+        });
+      }
+    </script>
+  </body>
+</html>
