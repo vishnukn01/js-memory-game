@@ -4,6 +4,7 @@ const scoreContainer = document.querySelector("#score-value");
 const failedAttemptsContainer = document.querySelector(
   "#failed-attempts-value"
 );
+const resetBtn = document.querySelector("#resetBtn");
 
 let score = 0;
 let failedAttempts = 0;
@@ -71,24 +72,22 @@ flipBox.forEach((fb) => {
   });
 });
 
-function performChecks(box) {
+function performChecks() {
   if (clickedArray[0].name === clickedArray[1].name) {
-    console.log("successful attempt");
     score = score + 1;
     // Update score in DOM
     scoreContainer.innerText = score;
   } else {
-    console.log("failed attempt");
     failedAttempts = failedAttempts + 1;
     // Update in DOM
     failedAttemptsContainer.innerText = failedAttempts;
     // Flip images back
-    flipBack(box);
+    flipBack();
   }
   clickedArray = [];
 }
 
-function flipBack(box) {
+function flipBack() {
   clickedArray.forEach((i) => {
     let el = document.querySelector(`[alt='${i.alt}']`).parentElement
       .parentElement.parentElement;
@@ -101,3 +100,7 @@ function flipBack(box) {
     }, 500);
   });
 }
+
+resetBtn.addEventListener("click", () => {
+  window.location.href = "/";
+});
